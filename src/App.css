@@ -1,34 +1,66 @@
+/* RESET GLOBAL PARA TODAS LAS PÁGINAS */
+:root {
+  overflow-x: hidden; /* Evita el scroll lateral en toda la web */
+}
+
 #root {
   width: 100%;
-  margin: 0 auto;
+  min-height: 100vh;
+  margin: 0;
+  padding: 0;
   text-align: center;
+  display: flex;
+  flex-direction: column;
 }
 
-/* Ajustes Responsivos Generales */
+/* AJUSTES RESPONSIVOS PARA MÓVIL (Pantallas menores a 768px) */
 @media (max-width: 768px) {
   #root {
-    padding: 1rem; /* Menos espacio en las orillas en celular */
+    padding: 0.5rem; /* Margen mínimo para que el contenido no toque los bordes */
   }
 
-  h2.text-6xl {
-    font-size: 3rem !important; /* Título más pequeño en móvil */
-    line-height: 1;
-  }
-
+  /* Forzamos que cualquier Grid de Tailwind se vuelva una sola columna */
   .grid {
-    gap: 1.5rem !important; /* Espaciado más compacto */
+    grid-template-columns: 1fr !important; 
+    gap: 1rem !important;
+    width: 100% !important;
   }
 
-  header {
-    margin-bottom: 2rem !important;
-    padding-top: 2rem !important;
+  /* Ajuste de textos gigantes para que quepan en la pantalla del celular */
+  h1, .text-6xl, .text-4xl {
+    font-size: 2.2rem !important; 
+    line-height: 1.1 !important;
+    letter-spacing: normal !important;
+  }
+
+  h2, .text-3xl {
+    font-size: 1.8rem !important;
+  }
+
+  /* Ajuste de contenedores para evitar desbordamiento */
+  .max-w-7xl, .container {
+    max-width: 100% !important;
+    padding-left: 10px !important;
+    padding-right: 10px !important;
+  }
+
+  /* Header y Navbar: de horizontal a vertical */
+  header, nav, .flex-row {
+    flex-direction: column !important;
+    gap: 15px !important;
+  }
+
+  /* Ajuste de botones para que sean fáciles de tocar */
+  button, .btn {
+    width: 100% !important; /* Botones a ancho completo en móvil */
+    margin-bottom: 0.5rem;
   }
 }
 
-/* Animaciones de logo y cards */
+/* ANIMACIONES (Mantenemos las tuyas pero optimizadas) */
 .logo {
-  height: 6em;
-  padding: 1.5em;
+  height: 4em; /* Un poco más pequeño para mobile-friendly */
+  padding: 1em;
   will-change: filter;
   transition: filter 300ms;
 }
