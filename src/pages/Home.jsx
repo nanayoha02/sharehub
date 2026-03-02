@@ -1,10 +1,34 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { supabase } from '../supabaseClient';
+// Importamos iconos de una librería como Lucide (muy ligera y moderna)
+import { 
+  Wrench, 
+  Wind, 
+  Tent, 
+  Smartphone, 
+  Home as HomeIcon, 
+  Trophy, 
+  Box 
+} from 'lucide-react';
 
 export default function Home() {
   const [recentItems, setRecentItems] = useState([]);
   const navigate = useNavigate();
+
+  // Función para asignar un icono según el nombre o categoría
+  const getIcon = (nombre, categoria) => {
+    const n = nombre.toLowerCase();
+    const c = categoria?.toLowerCase() || '';
+
+    if (n.includes('taladro') || c.includes('herramientas')) return <Wrench size={48} />;
+    if (n.includes('abanico') || n.includes('aire')) return <Wind size={48} />;
+    if (c.includes('camping')) return <Tent size={48} />;
+    if (c.includes('electrónica')) return <Smartphone size={48} />;
+    if (c.includes('hogar')) return <HomeIcon size={48} />;
+    if (c.includes('deportes')) return <Trophy size={48} />;
+    return <Box size={48} />; // Icono por defecto (la caja que tienes en el diseño)
+  };
 
   useEffect(() => {
     async function fetchRecent() {
@@ -21,101 +45,66 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-[#0B0F19] text-white font-sans overflow-x-hidden">
-      
-      {/* HERO SECTION: Fondo Técnico Industrial */}
-      <section className="relative min-h-[85vh] flex items-center overflow-hidden">
-        <div className="absolute inset-0 z-0">
-          <img 
-            src="https://images.unsplash.com/photo-1581092160562-40aa08e78837?auto=format&fit=crop&q=80&w=2000" 
-            className="w-full h-full object-cover opacity-20 grayscale"
-            alt="Hardware Tech"
-          />
-          <div className="absolute inset-0 bg-gradient-to-t from-[#0B0F19] via-[#0B0F19]/70 to-transparent"></div>
-        </div>
-
-        <div className="relative z-10 max-w-7xl mx-auto px-6 md:px-8 w-full">
-          <div className="max-w-4xl">
-            <h1 className="text-5xl sm:text-7xl md:text-8xl lg:text-9xl font-black leading-[0.85] uppercase tracking-tighter italic mb-6">
-              RESERVA.<br />
-              <span className="text-[#00D084]">NO COMPRES.</span>
-            </h1>
-            
-            <p className="text-base md:text-xl text-slate-300 font-bold max-w-xl mb-10 leading-tight">
-              Accede a herramientas y espacios premium cerca de ti. 
-              <span className="text-green-400 block mt-2">ShareHub: Maximizando activos.</span>
-            </p>
-
-            <div className="flex flex-col sm:flex-row gap-4 items-start">
-              <button onClick={() => navigate('/catalog')} className="w-full sm:w-auto bg-[#B7FF2A] text-black px-10 py-4 rounded-full font-black uppercase text-sm hover:scale-105 transition-all shadow-xl">
-                Reservar Ahora
-              </button>
-              <button onClick={() => navigate('/catalog')} className="w-full sm:w-auto bg-white/10 backdrop-blur-md border border-white/20 px-10 py-4 rounded-full font-black uppercase text-sm">
-                Ver Detalles
-              </button>
-            </div>
-          </div>
+      {/* HERO SECTION - Se mantiene igual de potente */}
+      <section className="relative min-h-[80vh] flex items-center p-6 md:p-20">
+        <div className="max-w-5xl z-10">
+           <h1 className="text-6xl md:text-[120px] font-black leading-none italic tracking-tighter uppercase mb-6">
+            RESERVA.<br/><span className="text-green-500">NO COMPRES.</span>
+           </h1>
+           <div className="flex gap-4 flex-wrap">
+             <button onClick={() => navigate('/catalog')} className="bg-[#B7FF2A] text-black px-8 py-4 rounded-full font-black uppercase text-sm hover:scale-105 transition-all">
+               Reservar Ahora
+             </button>
+             <button onClick={() => navigate('/catalog')} className="bg-white/5 border border-white/10 px-8 py-4 rounded-full font-black uppercase text-sm">
+               Ver Detalles
+             </button>
+           </div>
         </div>
       </section>
 
-      {/* SECCIÓN JOYAS CON IMÁGENES DINÁMICAS */}
-      <section className="max-w-7xl mx-auto px-6 md:px-8 -mt-10 md:-mt-20 relative z-20 pb-32">
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-12 gap-6">
-          <div className="space-y-2">
-            <h2 className="text-[10px] md:text-xs font-black text-green-400 uppercase tracking-[0.4em]">Comunidad Circular</h2>
-            <h3 className="text-3xl md:text-5xl font-black uppercase tracking-tighter italic leading-none">Joyas del Acceso <br className="md:hidden" /> Circular</h3>
-          </div>
-          <Link to="/catalog" className="group flex items-center gap-2 text-white font-black text-[10px] uppercase tracking-widest border-b-2 border-green-500 pb-1 hover:text-green-400 transition-colors">
-            Ver Todo <span className="group-hover:translate-x-1 transition-transform">→</span>
-          </Link>
-        </div>
-
+      {/* SECCIÓN JOYAS CON ICONOS (Estilo image_602602.png) */}
+      <section className="max-w-7xl mx-auto px-6 pb-32">
+        <h3 className="text-3xl font-black uppercase italic mb-12">Joyas del Acceso Circular</h3>
+        
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-          {recentItems.map((item) => {
-            // Lógica de imagen dinámica basada en el nombre del artículo
-            const query = encodeURIComponent(`${item.nombre_articulo} tool technical`);
-            const dynamicImg = `https://source.unsplash.com/featured/800x1000?${query}`;
-            const fallbackImg = "https://images.unsplash.com/photo-1581092160562-40aa08e78837?q=80&w=800";
-
-            return (
-              <div key={item.id_activo} className="group bg-[#161B28] rounded-[2.5rem] overflow-hidden border border-white/5 hover:border-green-500/50 transition-all duration-500 shadow-2xl">
-                <div className="aspect-[4/5] bg-slate-900 relative overflow-hidden">
-                  <img 
-                    src={dynamicImg} 
-                    className="w-full h-full object-cover opacity-50 group-hover:scale-110 transition-transform duration-700 grayscale hover:grayscale-0" 
-                    alt={item.nombre_articulo}
-                    onError={(e) => { e.target.src = fallbackImg; }}
-                  />
-                  <div className="absolute top-4 right-4 bg-black/80 backdrop-blur-md px-3 py-1.5 rounded-full border border-white/10">
-                     <p className="text-[9px] font-black text-green-400">-{ (item.peso_kg * 2.5).toFixed(1) }kg CO2</p>
-                  </div>
-                  <div className="absolute inset-0 bg-gradient-to-t from-[#161B28] via-transparent to-transparent"></div>
+          {recentItems.map(item => (
+            <div key={item.id_activo} className="bg-[#161B28] rounded-[2rem] p-8 border border-white/5 hover:border-green-500/30 transition-all group">
+              
+              {/* Contenedor del Icono (Simulando image_602602.png) */}
+              <div className="aspect-square bg-[#1c2333] rounded-3xl flex items-center justify-center mb-8 relative overflow-hidden">
+                <div className="text-slate-700 group-hover:text-green-500/40 transition-colors">
+                  {getIcon(item.nombre_articulo, item.categories?.nombre_categoria)}
                 </div>
-
-                <div className="p-8 -mt-12 relative z-10">
-                  <div className="mb-4">
-                    <h4 className="text-xl md:text-2xl font-black uppercase tracking-tighter leading-none mb-1 truncate">
-                      {item.nombre_articulo}
-                    </h4>
-                    <p className="text-[9px] font-bold text-slate-500 uppercase tracking-widest">
-                      {item.categories?.nombre_categoria || 'Activo Circular'}
-                    </p>
-                  </div>
-                  
-                  <div className="flex justify-between items-center pt-4 border-t border-white/5">
-                    <div>
-                      <p className="text-[8px] font-black text-slate-500 uppercase mb-1">Costo Acceso</p>
-                      <p className="text-2xl font-black italic tracking-tighter">
-                        ${item.precio_dia}<span className="text-xs font-normal text-slate-500">/día</span>
-                      </p>
-                    </div>
-                    <button onClick={() => navigate('/catalog')} className="bg-[#B7FF2A] text-black w-12 h-12 rounded-full flex items-center justify-center hover:bg-white transition-all shadow-lg">
-                      <span className="text-xl font-bold">→</span>
-                    </button>
-                  </div>
+                {/* Badge de CO2 */}
+                <div className="absolute top-4 right-4 bg-black/40 backdrop-blur-md px-3 py-1 rounded-full border border-white/10">
+                  <span className="text-[10px] font-black text-green-400">-{ (item.peso_kg * 2.5).toFixed(1) }kg CO2</span>
                 </div>
               </div>
-            );
-          })}
+
+              {/* Info del Producto */}
+              <div className="space-y-4">
+                <div>
+                  <p className="text-[10px] font-black text-green-500 uppercase tracking-widest mb-1">
+                    {item.categories?.nombre_categoria || 'Activo'}
+                  </p>
+                  <h4 className="text-2xl font-black uppercase tracking-tighter italic truncate">
+                    {item.nombre_articulo}
+                  </h4>
+                  <p className="text-[10px] text-slate-500 font-bold uppercase">📍 {item.ubicacion_texto || 'Panamá'}</p>
+                </div>
+
+                <div className="flex justify-between items-end pt-4 border-t border-white/5">
+                  <div>
+                    <p className="text-[9px] font-black text-slate-500 uppercase">Tarifa</p>
+                    <p className="text-2xl font-black">${item.precio_dia}<span className="text-xs text-slate-500 font-normal">/día</span></p>
+                  </div>
+                  <button className="bg-[#B7FF2A] text-black p-3 rounded-full hover:bg-white transition-colors">
+                    <span className="font-bold text-xl">→</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+          ))}
         </div>
       </section>
     </div>
