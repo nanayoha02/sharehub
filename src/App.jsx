@@ -1,26 +1,27 @@
-import { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 
-// Componentes
+// Componentes Globales
 import Navbar from './components/Navbar';
 import Footer from './components/Footer'; 
 
-// Páginas (Basado en tu estructura real de carpetas)
+// Páginas de la carpeta /pages
 import Home from './pages/Home';
 import Catalog from './pages/Catalog';
 import Garage from './pages/Garage';
 import Impact from './pages/Impact';
 import Trust from './pages/Trust';
 
-// Autenticación (Están en la raíz de /src según tu VS Code)
+// Componentes de Autenticación (Asegúrate de haberlos renombrado a .jsx)
 import Login from './Login'; 
 import Register from './Register'; 
 
 function App() {
   return (
     <Router>
-      <div className="min-h-screen flex flex-col bg-[#0B0F19]">
+      {/* Contenedor principal con el fondo oscuro oficial de la Red Circular */}
+      <div className="min-h-screen flex flex-col bg-[#0B0F19] text-white">
         <Navbar />
+        
         <main className="flex-grow">
           <Routes>
             <Route path="/" element={<Home />} />
@@ -28,10 +29,13 @@ function App() {
             <Route path="/garage" element={<Garage />} />
             <Route path="/impact" element={<Impact />} />
             <Route path="/trust" element={<Trust />} />
+            
+            {/* Rutas de acceso para el Eco Guerrero */}
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
           </Routes>
         </main>
+
         <Footer />
       </div>
     </Router>
