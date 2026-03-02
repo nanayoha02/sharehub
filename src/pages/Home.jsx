@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { supabase } from '../supabaseClient';
-// Importamos iconos de una librería como Lucide (muy ligera y moderna)
+// Importamos iconos de una librería como Lucide
 import { 
   Wrench, 
   Wind, 
@@ -27,7 +27,7 @@ export default function Home() {
     if (c.includes('electrónica')) return <Smartphone size={48} />;
     if (c.includes('hogar')) return <HomeIcon size={48} />;
     if (c.includes('deportes')) return <Trophy size={48} />;
-    return <Box size={48} />; // Icono por defecto (la caja que tienes en el diseño)
+    return <Box size={48} />;
   };
 
   useEffect(() => {
@@ -45,32 +45,51 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-[#0B0F19] text-white font-sans overflow-x-hidden">
-      {/* HERO SECTION - Se mantiene igual de potente */}
-      <section className="relative min-h-[80vh] flex items-center p-6 md:p-20">
-        <div className="max-w-5xl z-10">
-           <h1 className="text-6xl md:text-[120px] font-black leading-none italic tracking-tighter uppercase mb-6">
+      
+      {/* HERO SECTION - Con Imagen de Fondo de Economía Circular */}
+      <section className="relative min-h-[85vh] flex items-center p-6 md:p-20 overflow-hidden">
+        
+        {/* Capa de Imagen de Fondo */}
+        <div className="absolute inset-0 z-0">
+          <img 
+            src="https://images.unsplash.com/photo-1532996122724-e3c354a0b15b?auto=format&fit=crop&q=80&w=2070" 
+            alt="Sustainability Background" 
+            className="w-full h-full object-cover opacity-30"
+          />
+          {/* Overlay Degradado para legibilidad */}
+          <div className="absolute inset-0 bg-gradient-to-r from-[#0B0F19] via-[#0B0F19]/60 to-transparent"></div>
+        </div>
+
+        <div className="max-w-5xl z-10 relative">
+          <h1 className="text-6xl md:text-[120px] font-black leading-none italic tracking-tighter uppercase mb-6">
             RESERVA.<br/><span className="text-green-500">NO COMPRES.</span>
-           </h1>
-           <div className="flex gap-4 flex-wrap">
-             <button onClick={() => navigate('/catalog')} className="bg-[#B7FF2A] text-black px-8 py-4 rounded-full font-black uppercase text-sm hover:scale-105 transition-all">
-               Reservar Ahora
-             </button>
-             <button onClick={() => navigate('/catalog')} className="bg-white/5 border border-white/10 px-8 py-4 rounded-full font-black uppercase text-sm">
-               Ver Detalles
-             </button>
-           </div>
+          </h1>
+          <div className="flex gap-4 flex-wrap">
+            <button 
+              onClick={() => navigate('/catalog')} 
+              className="bg-[#B7FF2A] text-black px-8 py-4 rounded-full font-black uppercase text-sm hover:scale-105 transition-all shadow-[0_0_20px_rgba(183,255,42,0.3)]"
+            >
+              Reservar Ahora
+            </button>
+            <button 
+              onClick={() => navigate('/catalog')} 
+              className="bg-white/5 border border-white/10 backdrop-blur-md px-8 py-4 rounded-full font-black uppercase text-sm hover:bg-white/10 transition-all"
+            >
+              Ver Detalles
+            </button>
+          </div>
         </div>
       </section>
 
-      {/* SECCIÓN JOYAS CON ICONOS (Estilo image_602602.png) */}
-      <section className="max-w-7xl mx-auto px-6 pb-32">
+      {/* SECCIÓN JOYAS CON ICONOS */}
+      <section className="max-w-7xl mx-auto px-6 pb-32 relative z-10">
         <h3 className="text-3xl font-black uppercase italic mb-12">Joyas del Acceso Circular</h3>
         
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
           {recentItems.map(item => (
             <div key={item.id_activo} className="bg-[#161B28] rounded-[2rem] p-8 border border-white/5 hover:border-green-500/30 transition-all group">
               
-              {/* Contenedor del Icono (Simulando image_602602.png) */}
+              {/* Contenedor del Icono */}
               <div className="aspect-square bg-[#1c2333] rounded-3xl flex items-center justify-center mb-8 relative overflow-hidden">
                 <div className="text-slate-700 group-hover:text-green-500/40 transition-colors">
                   {getIcon(item.nombre_articulo, item.categories?.nombre_categoria)}
