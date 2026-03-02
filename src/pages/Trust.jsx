@@ -1,31 +1,45 @@
 import React from 'react';
 
-const Trust = ({ userRating, totalShares, co2SavedByUser }) => {
+const Trust = () => {
   return (
-    <div className="trust-module">
-      {/* 1. Validación de Comunidad (Estrellas del boceto) */}
-      <div className="rating-section">
-        <h3>Nivel de Confianza</h3>
-        <div className="stars">
-          {[...Array(5)].map((_, i) => (
-            <span key={i} className={i < userRating ? "star-filled" : "star-empty"}>★</span>
-          ))}
+    <section className="impacto-container">
+      <h2 style={{ color: '#2d6a4f', marginBottom: '30px' }}>¿Cómo funciona ShareHub?</h2>
+      
+      <div className="stats-grid">
+        {/* Pilar 1: Share (Compartir) */}
+        <div className="stat-card">
+            <div style={{ fontSize: '2.5rem', marginBottom: '10px' }}>🤝</div>
+            <h3 style={{ color: '#2d6a4f' }}>Share (Compartir)</h3>
+            <p style={{ fontSize: '0.9rem', color: '#444', lineHeight: '1.4' }}>
+                Facilitamos que varios usuarios utilicen un mismo activo, extendiendo su vida útil y evitando la compra de productos nuevos.
+            </p>
         </div>
-        <p>{totalShares} activos compartidos con éxito</p>
+
+        {/* Pilar 2: Optimize (Optimizar) */}
+        <div className="stat-card">
+            <div style={{ fontSize: '2.5rem', marginBottom: '10px' }}>⚙️</div>
+            <h3 style={{ color: '#2d6a4f' }}>Optimize (Optimizar)</h3>
+            <p style={{ fontSize: '0.9rem', color: '#444', lineHeight: '1.4' }}>
+                Mejoramos la eficiencia de activos que actualmente están ociosos, como herramientas o espacios de almacenamiento.
+            </p>
+        </div>
+
+        {/* Pilar 3: Virtualize (Virtualizar) */}
+        <div className="stat-card">
+            <div style={{ fontSize: '2.5rem', marginBottom: '10px' }}>💻</div>
+            <h3 style={{ color: '#2d6a4f' }}>Virtualize (Virtualizar)</h3>
+            <p style={{ fontSize: '0.9rem', color: '#444', lineHeight: '1.4' }}>
+                Sustituimos la necesidad de tiendas físicas de segunda mano por esta plataforma digital de gestión de activos.
+            </p>
+        </div>
       </div>
 
-      <hr />
-
-      {/* 2. Validación de Impacto (Conecta con ODS 13) */}
-      <div className="eco-validation">
-        <h4>Sello de Impacto Real</h4>
-        <div className="badge">
-          <span className="leaf-icon">🌱</span>
-          <span>Has evitado {co2SavedByUser}kg de CO2</span>
-        </div>
-        <p className="small-text">Basado en el modelo de Economía del Rendimiento</p>
+      <div style={{ marginTop: '30px', padding: '20px', backgroundColor: '#d8f3dc', borderRadius: '10px' }}>
+          <p style={{ fontWeight: 'bold', color: '#1b4332', margin: 0 }}>
+              Basado en la Economía del Rendimiento: Priorizamos el acceso sobre la propiedad.
+          </p>
       </div>
-    </div>
+    </section>
   );
 };
 
