@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import { supabase } from '../supabaseClient';
+import { Star } from 'lucide-react'; // Necesitas instalar lucide-react
 
 export default function Catalog() {
   const [items, setItems] = useState([]);
@@ -19,16 +20,32 @@ export default function Catalog() {
   async function fetchData() {
     try {
       setLoading(true);
+      
+      // Traemos activos con sus categorías y el promedio de sus ratings
       const { data: assetsData, error: assetsError } = await supabase
         .from('assets')
-        .select('*, categories (nombre_categoria)')
+        .select(`
+          *,
+          categories (nombre_categoria),
+          ratings (puntuacion)
+        `)
         .eq('disponible', true) 
         .order('id_activo', { ascending: false });
 
       const { data: catData } = await supabase.from('categories').select('nombre_categoria');
 
       if (assetsError) throw assetsError;
-      setItems(assetsData || []);
+
+      // Procesar datos para calcular el promedio de estrellas localmente
+      const itemsWithRatings = assetsData.map(item => {
+        const totalRatings = item.ratings?.length || 0;
+        const promedio = totalRatings > 0 
+          ? item.ratings.reduce((acc, curr) => acc + curr.puntuacion, 0) / totalRatings 
+          : 0;
+        return { ...item, promedio, totalRatings };
+      });
+
+      setItems(itemsWithRatings || []);
       if (catData) setCategorias(['Todos', ...catData.map(c => c.nombre_categoria)]);
     } catch (error) {
       console.error('Error:', error.message);
@@ -44,6 +61,23 @@ export default function Catalog() {
     return cumpleBusqueda && cumpleCategoria;
   });
 
+  // Sub-componente interno para las estrellas
+  const RatingStars = ({ valor, total }) => (
+    <div className="flex items-center gap-1.5">
+      <div className="flex gap-0.5">
+        {[1, 2, 3, 4, 5].map((s) => (
+          <Star 
+            key={s} 
+            size={12} 
+            fill={s <= Math.round(valor) ? "#eab308" : "transparent"} 
+            className={s <= Math.round(valor) ? "text-yellow-500" : "text-slate-600"}
+          />
+        ))}
+      </div>
+      <span className="text-[10px] font-bold text-slate-500">({total})</span>
+    </div>
+  );
+
   if (loading) return (
     <div className="min-h-screen bg-[#0B0F19] flex items-center justify-center p-4">
       <div className="text-center font-black text-green-500 animate-pulse uppercase tracking-widest text-xs">
@@ -56,6 +90,7 @@ export default function Catalog() {
     <div className="min-h-screen bg-[#0B0F19] text-white px-4 md:px-8 py-8 pb-32 overflow-x-hidden">
       <div className="max-w-7xl mx-auto animate-in fade-in duration-700">
         
+        {/* HEADER */}
         <header className="mb-10 md:mb-16 pt-6 md:pt-12">
           <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-8">
             <div className="w-full lg:max-w-2xl">
@@ -73,6 +108,7 @@ export default function Catalog() {
           </div>
         </header>
 
+        {/* CATEGORÍAS */}
         <div className="flex flex-nowrap overflow-x-auto md:flex-wrap gap-2 md:gap-3 mb-10 md:mb-16 border-b border-white/5 pb-6 no-scrollbar">
           {categorias.map(cat => (
             <button
@@ -89,12 +125,13 @@ export default function Catalog() {
           ))}
         </div>
 
+        {/* GRID DE PRODUCTOS */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-10">
           {filteredItems.length > 0 ? (
             filteredItems.map(item => (
-              <div key={item.id_activo} className="group bg-[#161B28] rounded-[2rem] overflow-hidden border border-white/5 hover:border-green-500/50 transition-all duration-500">
+              <div key={item.id_activo} className="group bg-[#161B28] rounded-[2rem] overflow-hidden border border-white/5 hover:border-green-500/50 transition-all duration-500 flex flex-col">
                 
-                {/* CONTENEDOR DE IMAGEN CORREGIDO */}
+                {/* IMAGEN */}
                 <div className="aspect-square sm:aspect-[4/3] bg-slate-800 relative overflow-hidden">
                   {item.foto_principal ? (
                     <img 
@@ -113,10 +150,15 @@ export default function Catalog() {
                   <div className="absolute inset-0 bg-gradient-to-t from-[#161B28] via-transparent to-transparent opacity-60"></div>
                 </div>
 
-                <div className="p-6 md:p-8 -mt-10 relative z-10">
-                  <span className="bg-green-500/10 text-green-400 text-[8px] font-black px-2 py-1 rounded-full uppercase border border-green-500/20 mb-3 inline-block">
-                    {item.categories?.nombre_categoria || 'Activo Circular'}
-                  </span>
+                {/* CONTENIDO */}
+                <div className="p-6 md:p-8 -mt-10 relative z-10 flex-grow flex flex-col">
+                  <div className="flex justify-between items-start mb-3">
+                    <span className="bg-green-500/10 text-green-400 text-[8px] font-black px-2 py-1 rounded-full uppercase border border-green-500/20 inline-block">
+                      {item.categories?.nombre_categoria || 'Activo Circular'}
+                    </span>
+                    <RatingStars valor={item.promedio} total={item.totalRatings} />
+                  </div>
+
                   <h4 className="font-black text-2xl md:text-3xl uppercase tracking-tighter leading-none mb-2 truncate">
                     {item.nombre_articulo}
                   </h4>
@@ -125,7 +167,7 @@ export default function Catalog() {
                     {item.ubicacion_texto || 'Panamá'}
                   </p>
 
-                  <div className="flex items-center justify-between mb-8 border-y border-white/5 py-4">
+                  <div className="flex items-center justify-between mt-auto mb-8 border-y border-white/5 py-4">
                     <div>
                       <p className="text-[8px] font-black text-slate-500 uppercase mb-1">Tarifa</p>
                       <p className="text-3xl font-black italic tracking-tighter">${item.precio_dia}<span className="text-xs font-normal text-slate-500">/día</span></p>
