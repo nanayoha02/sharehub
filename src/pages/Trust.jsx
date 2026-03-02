@@ -1,87 +1,110 @@
 import React from 'react';
 
 const Trust = () => {
-  // Definición de colores basada en tu interfaz oficial
-  const colors = {
-    background: '#0a0e17', // Fondo oscuro profundo
-    cardBg: '#161b22',      // Fondo de tarjeta sutil
-    primaryGreen: '#00e676', // Verde vibrante de los títulos
-    limeGreen: '#ccff00',    // Verde lima de los acentos/botones
-    textWhite: '#ffffff',
-    textGray: '#8b949e'
+  // Paleta de colores extraída de tu Dashboard oficial
+  const styleConfig = {
+    darkBg: '#0a0e17',      // Fondo principal
+    cardBg: '#161b22',      // Fondo de las tarjetas
+    neonGreen: '#00e676',   // Verde de los títulos
+    limeGreen: '#ccff00',   // Verde lima de acentos
+    whiteText: '#ffffff',
+    grayText: '#8b949e'
+  };
+
+  const sectionStyle = {
+    backgroundColor: styleConfig.darkBg,
+    padding: '60px 5%',
+    fontFamily: "'Inter', sans-serif",
+    color: styleConfig.whiteText
+  };
+
+  const gridStyle = {
+    display: 'flex',
+    gap: '20px',
+    flexWrap: 'wrap',
+    marginTop: '40px'
   };
 
   const cardStyle = {
-    backgroundColor: colors.cardBg,
-    padding: '30px',
-    borderRadius: '24px', // Bordes redondeados modernos
+    backgroundColor: styleConfig.cardBg,
+    padding: '40px',
+    borderRadius: '24px',
     border: '1px solid rgba(255, 255, 255, 0.05)',
-    textAlign: 'left',
     flex: '1',
-    minWidth: '280px'
+    minWidth: '300px',
+    transition: 'transform 0.3s ease'
   };
 
-  const titleStyle = {
-    color: colors.primaryGreen,
-    fontSize: '1.8rem',
+  const hugeTitle = {
+    fontSize: '4rem',
     fontWeight: '900',
-    textTransform: 'uppercase', // Estilo "PANEL DE IMPACTO"
-    marginBottom: '15px',
-    letterSpacing: '-1px'
+    lineHeight: '0.9',
+    margin: '0 0 10px 0',
+    textTransform: 'uppercase',
+    letterSpacing: '-2px'
   };
 
   return (
-    <section style={{ backgroundColor: colors.background, padding: '60px 5%', borderRadius: '30px' }}>
-      <div style={{ marginBottom: '50px' }}>
-        <h2 style={{ ...titleStyle, fontSize: '3rem', lineHeight: '1' }}>
-          EL MODELO <span style={{ color: colors.textWhite }}>ReSOLVE</span>
-        </h2>
-        <p style={{ color: colors.textGray, maxWidth: '700px', fontSize: '1.1rem' }}>
-          Maximizando activos, minimizando desperdicios: nuestra respuesta directa a la economía lineal.
+    <section style={sectionStyle}>
+      {/* Encabezado de Impacto */}
+      <div style={{ marginBottom: '60px' }}>
+        <h2 style={{ ...hugeTitle, color: styleConfig.whiteText }}>EL MODELO</h2>
+        <h2 style={{ ...hugeTitle, color: styleConfig.neonGreen }}>RESOLVE</h2>
+        <p style={{ color: styleConfig.grayText, fontSize: '1.2rem', marginTop: '20px', maxWidth: '600px' }}>
+          Maximizando activos, minimizando desperdicios. Nuestra infraestructura digital para la economía del rendimiento.
         </p>
       </div>
 
-      <div style={{ display: 'flex', gap: '20px', flexWrap: 'wrap' }}>
+      <div style={gridStyle}>
         {/* Pilar 1: Share */}
         <div style={cardStyle}>
-          <div style={{ color: colors.limeGreen, fontSize: '1.5rem', marginBottom: '20px' }}>● 01</div>
-          <h3 style={titleStyle}>Share</h3>
-          <p style={{ color: colors.textWhite, opacity: 0.8, lineHeight: '1.6' }}>
-            Facilitamos que varios usuarios utilicen un mismo activo, extendiendo su vida útil y evitando la compra de productos nuevos.
+          <div style={{ color: styleConfig.limeGreen, fontWeight: 'bold', marginBottom: '15px' }}>// 01. COMPARTIR</div>
+          <h3 style={{ color: styleConfig.neonGreen, fontSize: '1.5rem', marginBottom: '15px', textTransform: 'uppercase' }}>Share</h3>
+          <p style={{ color: styleConfig.whiteText, opacity: 0.8, lineHeight: '1.6' }}>
+            Facilitamos que varios usuarios utilicen un mismo activo, extendiendo su vida útil y evitando la fabricación innecesaria.
           </p>
         </div>
 
         {/* Pilar 2: Optimize */}
         <div style={cardStyle}>
-          <div style={{ color: colors.limeGreen, fontSize: '1.5rem', marginBottom: '20px' }}>● 02</div>
-          <h3 style={titleStyle}>Optimize</h3>
-          <p style={{ color: colors.textWhite, opacity: 0.8, lineHeight: '1.6' }}>
-            Mejoramos la eficiencia de activos ociosos, como herramientas o espacios, transformando la inactividad en valor.
+          <div style={{ color: styleConfig.limeGreen, fontWeight: 'bold', marginBottom: '15px' }}>// 02. OPTIMIZAR</div>
+          <h3 style={{ color: styleConfig.neonGreen, fontSize: '1.5rem', marginBottom: '15px', textTransform: 'uppercase' }}>Optimize</h3>
+          <p style={{ color: styleConfig.whiteText, opacity: 0.8, lineHeight: '1.6' }}>
+            Mejoramos la eficiencia de activos ociosos. Si no se usa, se comparte. Maximizamos el rendimiento de cada producto.
           </p>
         </div>
 
         {/* Pilar 3: Virtualize */}
         <div style={cardStyle}>
-          <div style={{ color: colors.limeGreen, fontSize: '1.5rem', marginBottom: '20px' }}>● 03</div>
-          <h3 style={titleStyle}>Virtualize</h3>
-          <p style={{ color: colors.textWhite, opacity: 0.8, lineHeight: '1.6' }}>
-            Sustituimos la infraestructura física por una plataforma digital de gestión de activos inteligente.
+          <div style={{ color: styleConfig.limeGreen, fontWeight: 'bold', marginBottom: '15px' }}>// 03. VIRTUALIZAR</div>
+          <h3 style={{ color: styleConfig.neonGreen, fontSize: '1.5rem', marginBottom: '15px', textTransform: 'uppercase' }}>Virtualize</h3>
+          <p style={{ color: styleConfig.whiteText, opacity: 0.8, lineHeight: '1.6' }}>
+            Sustituimos la propiedad física por el acceso digital. Gestionamos activos, no solo objetos.
           </p>
         </div>
       </div>
 
-      {/* Banner de Economía del Rendimiento */}
+      {/* Footer del componente al estilo 'RESERVA. NO COMPRES' */}
       <div style={{ 
-        marginTop: '40px', 
-        padding: '25px', 
-        background: `linear-gradient(90deg, ${colors.primaryGreen}, ${colors.limeGreen})`, 
-        borderRadius: '15px',
-        color: '#000',
-        fontWeight: 'bold',
-        textAlign: 'center',
-        fontSize: '1.2rem'
+        marginTop: '60px', 
+        borderTop: `1px solid ${styleConfig.cardBg}`, 
+        paddingTop: '30px',
+        display: 'flex',
+        alignItems: 'center',
+        gap: '20px'
       }}>
-        ACCESO SOBRE PROPIEDAD: PRIORIZANDO EL SERVICIO Y EL RENDIMIENTO.
+        <div style={{ 
+          backgroundColor: styleConfig.limeGreen, 
+          color: '#000', 
+          padding: '10px 20px', 
+          fontWeight: '900', 
+          borderRadius: '5px' 
+        }}>
+          ODS 12 + 13
+        </div>
+        <p style={{ fontWeight: 'bold', textTransform: 'uppercase', letterSpacing: '1px' }}>
+          Acceso sobre propiedad: El futuro es circular.
+        </p>
       </div>
     </section>
   );
