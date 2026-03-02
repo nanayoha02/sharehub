@@ -213,6 +213,8 @@ export default function Garage() {
                       <option value="1">Herramientas</option>
                       <option value="2">Camping</option>
                       <option value="3">Electrónica</option>
+                      <option value="4">Hogar</option>
+                      <option value="5">Deportes</option>
                     </select>
                   </div>
 
