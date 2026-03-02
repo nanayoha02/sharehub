@@ -1,13 +1,14 @@
 import { useEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import { supabase } from '../supabaseClient';
-import { Star } from 'lucide-react'; // Necesitas instalar lucide-react
+import { Star } from 'lucide-react';
 
 export default function Catalog() {
   const [items, setItems] = useState([]);
   const [categorias, setCategorias] = useState(['Todos']);
   const [categoriaSeleccionada, setCategoriaSeleccionada] = useState('Todos');
   const [loading, setLoading] = useState(true);
+  const [vovandoId, setVotandoId] = useState(null); // Para feedback visual al votar
   
   const { search } = useLocation();
   const queryParams = new URLSearchParams(search);
@@ -20,8 +21,6 @@ export default function Catalog() {
   async function fetchData() {
     try {
       setLoading(true);
-      
-      // Traemos activos con sus categorías y el promedio de sus ratings
       const { data: assetsData, error: assetsError } = await supabase
         .from('assets')
         .select(`
@@ -36,7 +35,6 @@ export default function Catalog() {
 
       if (assetsError) throw assetsError;
 
-      // Procesar datos para calcular el promedio de estrellas localmente
       const itemsWithRatings = assetsData.map(item => {
         const totalRatings = item.ratings?.length || 0;
         const promedio = totalRatings > 0 
@@ -54,6 +52,31 @@ export default function Catalog() {
     }
   }
 
+  // FUNCIÓN PARA ENVIAR VALORACIÓN
+  const enviarVoto = async (idActivo, valor) => {
+    setVotandoId(idActivo);
+    try {
+      const userEmail = localStorage.getItem('user_email') || 'eco_guerrero@red.com';
+      
+      const { error } = await supabase
+        .from('ratings')
+        .insert([{ 
+          id_activo: idActivo, 
+          puntuacion: valor, 
+          usuario_email: userEmail 
+        }]);
+
+      if (error) throw error;
+      
+      // Refrescamos datos para ver el cambio en el promedio
+      await fetchData(); 
+    } catch (error) {
+      alert("Error al guardar valoración: " + error.message);
+    } finally {
+      setVotandoId(null);
+    }
+  };
+
   const filteredItems = items.filter(item => {
     const cumpleBusqueda = item.nombre_articulo?.toLowerCase().includes(searchTerm);
     const cumpleCategoria = categoriaSeleccionada === 'Todos' || 
@@ -61,22 +84,35 @@ export default function Catalog() {
     return cumpleBusqueda && cumpleCategoria;
   });
 
-  // Sub-componente interno para las estrellas
-  const RatingStars = ({ valor, total }) => (
-    <div className="flex items-center gap-1.5">
-      <div className="flex gap-0.5">
-        {[1, 2, 3, 4, 5].map((s) => (
-          <Star 
-            key={s} 
-            size={12} 
-            fill={s <= Math.round(valor) ? "#eab308" : "transparent"} 
-            className={s <= Math.round(valor) ? "text-yellow-500" : "text-slate-600"}
-          />
-        ))}
+  // COMPONENTE DE ESTRELLAS INTERACTIVO
+  const RatingStars = ({ valor, total, idActivo }) => {
+    const [hover, setHover] = useState(0);
+    
+    return (
+      <div className="flex flex-col gap-1">
+        <div className="flex items-center gap-1.5">
+          <div className="flex gap-0.5">
+            {[1, 2, 3, 4, 5].map((s) => (
+              <button
+                key={s}
+                onMouseEnter={() => setHover(s)}
+                onMouseLeave={() => setHover(0)}
+                onClick={() => enviarVoto(idActivo, s)}
+                className={`transition-transform active:scale-125 ${vovandoId === idActivo ? 'animate-pulse' : ''}`}
+              >
+                <Star 
+                  size={14} 
+                  fill={(hover || Math.round(valor)) >= s ? "#eab308" : "transparent"} 
+                  className={(hover || Math.round(valor)) >= s ? "text-yellow-500" : "text-slate-600"}
+                />
+              </button>
+            ))}
+          </div>
+          <span className="text-[10px] font-black text-slate-500">({total})</span>
+        </div>
       </div>
-      <span className="text-[10px] font-bold text-slate-500">({total})</span>
-    </div>
-  );
+    );
+  };
 
   if (loading) return (
     <div className="min-h-screen bg-[#0B0F19] flex items-center justify-center p-4">
@@ -108,7 +144,7 @@ export default function Catalog() {
           </div>
         </header>
 
-        {/* CATEGORÍAS */}
+        {/* FILTROS */}
         <div className="flex flex-nowrap overflow-x-auto md:flex-wrap gap-2 md:gap-3 mb-10 md:mb-16 border-b border-white/5 pb-6 no-scrollbar">
           {categorias.map(cat => (
             <button
@@ -125,74 +161,61 @@ export default function Catalog() {
           ))}
         </div>
 
-        {/* GRID DE PRODUCTOS */}
+        {/* GRID */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-10">
-          {filteredItems.length > 0 ? (
-            filteredItems.map(item => (
-              <div key={item.id_activo} className="group bg-[#161B28] rounded-[2rem] overflow-hidden border border-white/5 hover:border-green-500/50 transition-all duration-500 flex flex-col">
-                
-                {/* IMAGEN */}
-                <div className="aspect-square sm:aspect-[4/3] bg-slate-800 relative overflow-hidden">
-                  {item.foto_principal ? (
-                    <img 
-                      src={item.foto_principal} 
-                      alt={item.nombre_articulo} 
-                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
-                    />
-                  ) : (
-                    <div className="absolute inset-0 flex items-center justify-center text-6xl opacity-20">📦</div>
-                  )}
-                  
-                  <div className="absolute top-4 left-4 bg-black/60 backdrop-blur-md border border-white/10 px-3 py-1.5 rounded-xl z-20">
-                    <p className="text-[8px] font-black text-green-400 uppercase">Huella Evitada</p>
-                    <p className="text-[10px] font-bold">-{ (item.peso_kg * 2.5).toFixed(1) }kg CO2</p>
-                  </div>
-                  <div className="absolute inset-0 bg-gradient-to-t from-[#161B28] via-transparent to-transparent opacity-60"></div>
-                </div>
-
-                {/* CONTENIDO */}
-                <div className="p-6 md:p-8 -mt-10 relative z-10 flex-grow flex flex-col">
-                  <div className="flex justify-between items-start mb-3">
-                    <span className="bg-green-500/10 text-green-400 text-[8px] font-black px-2 py-1 rounded-full uppercase border border-green-500/20 inline-block">
-                      {item.categories?.nombre_categoria || 'Activo Circular'}
-                    </span>
-                    <RatingStars valor={item.promedio} total={item.totalRatings} />
-                  </div>
-
-                  <h4 className="font-black text-2xl md:text-3xl uppercase tracking-tighter leading-none mb-2 truncate">
-                    {item.nombre_articulo}
-                  </h4>
-                  <p className="text-slate-500 text-[9px] font-bold uppercase mb-6 flex items-center gap-2">
-                    <span className="w-1.5 h-1.5 bg-green-500 rounded-full"></span>
-                    {item.ubicacion_texto || 'Panamá'}
-                  </p>
-
-                  <div className="flex items-center justify-between mt-auto mb-8 border-y border-white/5 py-4">
-                    <div>
-                      <p className="text-[8px] font-black text-slate-500 uppercase mb-1">Tarifa</p>
-                      <p className="text-3xl font-black italic tracking-tighter">${item.precio_dia}<span className="text-xs font-normal text-slate-500">/día</span></p>
-                    </div>
-                    <div className="text-right">
-                       <p className="text-[8px] font-black text-slate-500 uppercase mb-1">Status</p>
-                       <p className="text-[10px] font-bold text-green-500 uppercase tracking-widest">Disponible</p>
-                    </div>
-                  </div>
-
-                  <a 
-                    href={`https://wa.me/${item.telefono_contacto?.replace(/\D/g, '')}?text=Hola, me interesa alquilar: ${item.nombre_articulo}`} 
-                    target="_blank" rel="noreferrer"
-                    className="flex items-center justify-center gap-2 w-full bg-white text-black py-4 rounded-xl font-black text-[10px] uppercase tracking-widest hover:bg-green-500 transition-all active:scale-95"
-                  >
-                    Solicitar Acceso ⚡
-                  </a>
+          {filteredItems.map(item => (
+            <div key={item.id_activo} className="group bg-[#161B28] rounded-[2rem] overflow-hidden border border-white/5 hover:border-green-500/50 transition-all duration-500 flex flex-col">
+              
+              <div className="aspect-square sm:aspect-[4/3] bg-slate-800 relative overflow-hidden">
+                {item.foto_principal ? (
+                  <img src={item.foto_principal} alt={item.nombre_articulo} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
+                ) : (
+                  <div className="absolute inset-0 flex items-center justify-center text-6xl opacity-20">📦</div>
+                )}
+                <div className="absolute top-4 left-4 bg-black/60 backdrop-blur-md border border-white/10 px-3 py-1.5 rounded-xl z-20">
+                  <p className="text-[8px] font-black text-green-400 uppercase italic">Impacto Eco</p>
+                  <p className="text-[10px] font-bold">-{ (item.peso_kg * 2.5).toFixed(1) }kg CO2</p>
                 </div>
               </div>
-            ))
-          ) : (
-            <div className="col-span-full py-20 text-center bg-white/5 rounded-[2rem] border border-dashed border-white/10">
-              <p className="text-slate-500 font-bold uppercase text-xs">Sin activos disponibles en esta categoría.</p>
+
+              <div className="p-6 md:p-8 -mt-10 relative z-10 flex-grow flex flex-col">
+                <div className="flex justify-between items-start mb-4">
+                  <span className="bg-green-500/10 text-green-400 text-[8px] font-black px-2 py-1 rounded-full uppercase border border-green-500/20">
+                    {item.categories?.nombre_categoria || 'Activo'}
+                  </span>
+                  <RatingStars valor={item.promedio} total={item.totalRatings} idActivo={item.id_activo} />
+                </div>
+
+                <h4 className="font-black text-2xl md:text-3xl uppercase tracking-tighter leading-none mb-2 truncate">
+                  {item.nombre_articulo}
+                </h4>
+                
+                <p className="text-slate-500 text-[9px] font-bold uppercase mb-6 flex items-center gap-2">
+                  <span className="w-1.5 h-1.5 bg-green-500 rounded-full"></span>
+                  {item.ubicacion_texto || 'Panamá'}
+                </p>
+
+                <div className="flex items-center justify-between mt-auto mb-8 border-y border-white/5 py-4">
+                  <div>
+                    <p className="text-[8px] font-black text-slate-500 uppercase mb-1">Tarifa</p>
+                    <p className="text-3xl font-black italic tracking-tighter">${item.precio_dia}<span className="text-xs font-normal text-slate-500">/día</span></p>
+                  </div>
+                  <div className="text-right">
+                     <p className="text-[8px] font-black text-slate-500 uppercase mb-1">Status</p>
+                     <p className="text-[10px] font-bold text-green-500 uppercase">Disponible</p>
+                  </div>
+                </div>
+
+                <a 
+                  href={`https://wa.me/${item.telefono_contacto?.replace(/\D/g, '')}?text=Hola, me interesa alquilar: ${item.nombre_articulo}`} 
+                  target="_blank" rel="noreferrer"
+                  className="flex items-center justify-center gap-2 w-full bg-white text-black py-4 rounded-xl font-black text-[10px] uppercase tracking-widest hover:bg-green-500 transition-all active:scale-95"
+                >
+                  Solicitar Acceso ⚡
+                </a>
+              </div>
             </div>
-          )}
+          ))}
         </div>
       </div>
     </div>
